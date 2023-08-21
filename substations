@@ -1,0 +1,270 @@
+import pandas as pd
+import datetime
+import matplotlib.pyplot as plt
+import cProfile
+import re
+
+df = pd.read_excel(r'first_run_of_buses.xlsx')
+half_hour = df["half_hour"]
+mw = df["cleansed_mw"]
+bus_number = df["bus_number"]
+df['half_hour'] = df['half_hour'].map(str)
+
+
+# print(half_hour)
+
+# arr = half_hour.to_numpy()
+
+# for i< length:
+#	arr[i].repla
+# by_bus_num = df.groupby("bus_number")
+# print(by_bus_num)
+# ordered=df.loc[]
+# takes in a dataframe that has bus_number column function requires a certain bus_number
+def get_bus(bus_num, data_frame):
+	table_filtered = data_frame[data_frame['bus_number'] == bus_num]
+	return table_filtered
+
+
+# g.apply(lambda x:)
+# df.plot(x='half_hour', y='cleansed_mw',kind='scatter')
+# plt.ylabel("cleansed_mw")
+# plt.xlabel("time")
+# plt.show()
+# i want to seperate the time by month,year and day then time in the day
+# def split_date(date_string):
+
+df[['date', 'time']] = df['half_hour'].str.split(expand=True)
+
+# print("date_string=", date_string)
+# date_obj=datetime.datetime.strptime(date_string,)
+
+
+# [year,month,day,time]=
+# date=datetime.datetime.strptime(string,%d )
+
+results_df_1002 = df[df['bus_number'] == 1002]
+results_df_1004 = df[df['bus_number'] == 1004]
+results_df_2037 = df[df['bus_number'] == 2037]
+results_df_2025 = df[df['bus_number'] == 2025]
+
+pd.to_datetime(results_df_1002['date'], format='%Y-%m-%d')
+pd.to_datetime(results_df_1002['time'], format='%H:%M:%S')
+pd.to_datetime(results_df_1004['date'], format='%Y-%m-%d')
+pd.to_datetime(results_df_1004['time'], format='%H:%M:%S')
+pd.to_datetime(results_df_2037['date'], format='%Y-%m-%d')
+pd.to_datetime(results_df_2037['time'], format='%H:%M:%S')
+pd.to_datetime(results_df_2025['date'], format='%Y-%m-%d')
+pd.to_datetime(results_df_2025['time'], format='%H:%M:%S')
+filtered_results_df_1002 = results_df_1002.loc[
+	(results_df_1002['date'] >= '2021-12-01') & (results_df_1002['date'] <= '2021-12-08')]
+filtered_results_df_1004 = results_df_1004.loc[
+	(results_df_1004['date'] >= '2021-12-01') & (results_df_1004['date'] <= '2021-12-08')]
+
+filtered_results_df_2037 = results_df_2037.loc[
+	(results_df_2037['date'] >= '2021-12-01') & (results_df_2037['date'] <= '2021-12-31')]
+
+filtered_results_df_2025 = results_df_2025.loc[
+	(results_df_2025['date'] >= '2021-12-01') & (results_df_2025['date'] <= '2021-12-31')]
+
+# for bus 1004 ive got a week worth of data now i can group by time
+
+# what i want to do here is take in num which is bus number you want,and data_frame is the df you want to get the bus data from.first filter by bus data then split by time
+RATING_SEASON_MAP = {'01': 'Winter',
+					 '02': 'Winter',
+					 '03': 'Intermediate Cool',
+					 '04': 'Intermediate Cool',
+					 '05': 'Intermediate Warm',
+					 '06': 'Summer',
+					 '07': 'Summer',
+					 '08': 'Summer',
+					 '09': 'Intermediate Warm',
+					 '10': 'Intermediate Warm',
+					 '11': 'Intermediate Cool',
+					 '12': 'Winter'}
+
+
+def excel(data_fram):
+	data_fram[['date', 'time']] = data_fram['half_hour'].str.split(expand=True)
+	data_fram[['year', 'month', 'day']] = data_fram['date'].str.split('-', expand=True)
+	data_fram['season'] = data_fram['month'].map(RATING_SEASON_MAP)
+
+	max_of_specific_bus: float = results_dfe['cleansed_mw'].max()
+	min_of_specific_bus: float = results_dfe['cleansed_mw'].min()
+
+
+def streamlined(data_fram, num):
+	new_list = data_fram["bus_number"].unique()
+	data_fram[['date', 'time']] = data_fram['half_hour'].str.split(expand=True)
+	data_fram[['year', 'month', 'day']] = data_fram['date'].str.split('-', expand=True)
+	data_fram['season'] = data_fram['month'].map(RATING_SEASON_MAP)
+	#	data_fram.drop(columns=['year', 'day'], axis=1)
+	results_dfe: data_fram = data_fram[data_fram["bus_number"] == num]
+	print(results_dfe['month'])
+	print(results_dfe['season'])
+	max_of_specific_bus: float = results_dfe['cleansed_mw'].max()
+	min_of_specific_bus: float = results_dfe['cleansed_mw'].min()
+	results_dfe['max normalised output'] = results_dfe['cleansed_mw'].div(max_of_specific_bus)
+	results_dfe['min normalised output'] = results_dfe['cleansed_mw'].div(min_of_specific_bus)
+	# print(results_dfe['max normalised output'])
+	# print(results_dfe['min normalised output'])
+	# results_dfe.to_excel("result_dfe.xlsx")
+
+	print(max_of_specific_bus)
+	pd.to_datetime(results_dfe['date'], format='%Y-%m-%d')
+	# results_dfe['month'] = results_dfe['date'].dt.strftime('%m')
+
+	# if season == "w":
+	lower_bound5 = '2021-12-07'
+	upper_bound5 = '2022-02-24'
+	# elif season == "S":
+	lower_bound6 = '2021-06-01'
+	upper_bound6 = '2021-08-31'
+	# elif season == 'IC':
+	lower_bound1 = '2021-03-02'
+	upper_bound1 = '2021-04-27'
+
+	lower_bound2 = '2021-11-02'
+	upper_bound2 = '2021-11-30'
+
+	# elif season == 'IW':
+	lower_bound3 = '2021-09-07'
+	upper_bound3 = '2021-10-26'
+
+	lower_bound4 = '2021-05-04'
+	upper_bound4 = '2021-05-25'
+	# NOW MY NEXT STEP AFTER PLOTTING EACH SEASON SEPRATELY NOW I NEED TO PLOT ALL GRAPHS AT THE SAME TIME
+	# if season == 'IC':
+	x = ((results_dfe['date'] >= lower_bound1) & (results_dfe['date'] <= upper_bound1))
+	y = ((results_dfe['date'] >= lower_bound2) & (results_dfe['date'] <= upper_bound2))
+
+	filtered_results_dfe1 = results_dfe.loc[
+		x
+	]
+	filtered_results_dfe2 = results_dfe.loc[
+		y
+	]
+	filtered_results_dfe_ic = pd.concat([filtered_results_dfe1, filtered_results_dfe2])
+
+	# elif season == 'IW':
+	x = ((results_dfe['date'] >= lower_bound3) & (results_dfe['date'] <= upper_bound3))
+	y = ((results_dfe['date'] >= lower_bound4) & (results_dfe['date'] <= upper_bound4))
+	# z = x or y
+	# print(f"this is x {x}")
+	# print( f"this is y {y}")
+	# mylist = [x, y]
+	filtered_results_dfe1 = results_dfe.loc[
+		x
+	]
+	filtered_results_dfe2 = results_dfe.loc[
+		y
+	]
+	filtered_results_dfe_iw = pd.concat([filtered_results_dfe1, filtered_results_dfe2])
+	# elif season == 'S':
+	filtered_results_dfe_ss = results_dfe.loc[
+		(results_dfe['date'] >= lower_bound6) & (results_dfe['date'] <= upper_bound6)
+		]
+	# elif season=='W':
+	filtered_results_dfe_ww = results_dfe.loc[
+		(results_dfe['date'] >= lower_bound5) & (results_dfe['date'] <= upper_bound5)
+		]
+	season_ic = 'Intermediate cool'
+	season_iw = 'Intermediate warm'
+	season_ss = 'Summer'
+	season_ww = 'Winter'
+
+	profile_ic = filtered_results_dfe_ic.groupby('time')
+	profile_iw = filtered_results_dfe_iw.groupby('time')
+	profile_ss = filtered_results_dfe_ss.groupby('time')
+	profile_ww = filtered_results_dfe_ww.groupby('time')
+
+	# print(profile_ic['cleansed_mw'].max())
+	axis_xx = range(48)
+	fig1, ax1 = plt.subplots()
+###### line 176 is where I group each bus by time
+###### line 186 plotting the maximum of the bus at that time(certain half an hour there is 17520 half hours each year)
+	ax1.plot(axis_xx, profile_ic['cleansed_mw'].max().div(max_of_specific_bus), 'r')
+	ax1.plot(axis_xx, profile_iw['cleansed_mw'].max().div(max_of_specific_bus), 'b')
+	ax1.plot(axis_xx, profile_ss['cleansed_mw'].max().div(max_of_specific_bus), 'g')
+	ax1.plot(axis_xx, profile_ww['cleansed_mw'].max().div(max_of_specific_bus), 'k')
+	ax1.legend(['intermediate cool', 'intermediate warm', 'summer', 'winter'])
+	# print(profile_ic['cleansed_mw'])
+
+	ax1.set(xlabel='time(per half hour unit for 1 day)', ylabel='cleansed_mw',
+			title=f"bus  {str(num)} max for every half an hour in each predefined season 2021-2022")
+	plt.show()
+	return filtered_results_dfe_iw
+#change back to results dfe ,right now testing if intermediate warm is better
+
+cProfile.run('streamlined(df,1002)')
+
+# streamlined(df, 2025)
+# print("streamlined done")
+new_lists = df["bus_number"].unique()
+# season = input(
+# "what season would you like to receive: W for winter,IC for intermediate cool,IW for intermediate warm,S for Summer,IW for intermediate warm:").upper()
+# zd = pd.DataFrame
+zd2 = pd.DataFrame()
+result = pd.DataFrame()
+#  I made some hanges so that instead of asking for what season you want I jsut poridecue all of the easons at the same time
+
+for i in range(len(new_lists)):
+	# zd = pd.DataFrame()
+	# streamlined(df, new_lists[i])
+	# result = pd.DataFrame()
+	result = streamlined(df, new_lists[i])
+	zd2 = pd.concat([zd2, result])
+
+zd2.to_excel('IW.xlsx')
+# df is a data frame and new_lists[i] should be a bus_number
+
+profile_1004_1_week_max = filtered_results_df_1004.groupby('time')
+print(profile_1004_1_week_max['cleansed_mw'].max())
+# fig, axs = plt.subplots(1, 2)
+# axs[1, 1].plot(profile_1004_1_week_max['time'], profile_1004_1_week_max['cleansed_mw'].max(), 'r', linestyle='-')
+# axs[1, 1].title.set_text('max of every half_hour within 1 week of bus 1004')
+# axs[1, 1].set_ylabel('cleansed_mw')
+# axs[1, 1].set_xlabel('time in half hours')
+# plt.show()
+
+
+axis_x = range(48)
+fig, ax = plt.subplots()
+ax.plot(axis_x, profile_1004_1_week_max['cleansed_mw'].max().div(18.389999))
+ax.set(xlabel='time(per half hour unit for 1 day)', ylabel='cleansed_mw',
+	   title='bus 1004"s max for every half an hour in the first week of december')
+plt.show()
+
+# profile_1004_1_week_max.apply(lambda x: find_max(x), axis=1)
+# def find_max(x):
+# return x['cleansed_mw'].max()
+### NOT TO DO WITH THE CLUSTERING
+fig, axs = plt.subplots(nrows=2, ncols=2)
+axs[0, 1].plot(filtered_results_df_1002['half_hour'], filtered_results_df_1002['cleansed_mw'], 'r', linestyle='-')
+axs[0, 1].title.set_text('december 2021 cleansed mw for us 1002')
+axs[0, 1].set_ylabel('cleansed_mw')
+axs[0, 1].set_xlabel('time in half hours')
+
+axs[0, 0].plot(filtered_results_df_1004['half_hour'], filtered_results_df_1004['cleansed_mw'], 'b', linestyle='-')
+axs[0, 0].title.set_text('december 2021 cleansed mw for bus 1004')
+axs[0, 0].set_ylabel('cleansed_mw')
+axs[0, 0].set_xlabel('time in half hours')
+
+axs[1, 1].plot(filtered_results_df_2037['half_hour'], filtered_results_df_2037['cleansed_mw'], 'g', linestyle='-')
+axs[1, 1].title.set_text('december 2021 cleansed mw for bus 2037')
+axs[1, 1].set_ylabel('cleansed_mw')
+axs[1, 1].set_xlabel('time in half hours')
+
+axs[1, 0].plot(filtered_results_df_2025['half_hour'], filtered_results_df_2025['cleansed_mw'] / 2, 'm', linestyle='-')
+axs[1, 0].title.set_text('december 2021 cleansed mw for bus 2025')
+axs[1, 0].set_ylabel('cleansed_mw')
+axs[1, 0].set_xlabel('time in half hours')
+
+plt.show()
+
+
+def main():
+	streamlined(df, 1004)
+	print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+	if __name__ == "__main__":
+		main()
