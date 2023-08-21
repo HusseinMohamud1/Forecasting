@@ -1,0 +1,23 @@
+import pandas as pd
+
+#df = pd.read_excel(r'C:\Users\hamohamud\Documents\NEW_DEMAND.xlsx', sheet_name='Sheet1', usecols=['sub', 'half_hour', 'cleansed_mw', 'max normalised output'])
+df = pd.read_csv(r'C:\Users\hamohamud\Documents\edited.csv', usecols=['sub', 'half_hour', 'cleansed_mw', 'max normalised output','season'])
+
+
+grps = df.groupby('sub')
+
+he = []
+#grp_name is bus      grp_df is data for each bus
+for grp_name, grp_df in grps:
+	normalised_mw = grp_df[['max normalised output']].fillna(0)
+	normalised_list = normalised_mw.values.flatten().tolist()
+	he.append(normalised_list)
+#	print(grp_name)
+#	print(normalised_list)
+
+	#print(len(normalised_list))
+#print(grp_name)
+print(he)
+
+
+print()
