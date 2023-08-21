@@ -1,0 +1,123 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import cProfile
+import re
+import datetime
+
+from tslearn.clustering import TimeSeriesKMeans, silhouette_score
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+from tslearn.utils import to_time_series_dataset
+#df = pd.read_excel(r'C:\Users\hamohamud\Documents\NEW_DEMAND.xlsx', sheet_name='Sheet1', usecols=['sub', 'half_hour', 'cleansed_mw', 'max normalised output'])
+df = pd.read_csv(r'C:\Users\hamohamud\PycharmProjects\test_1\IW.csv',  usecols=['bus_number', 'half_hour', 'cleansed_mw', 'max normalised output'])
+
+
+grps = df.groupby('bus_number')
+
+he = []
+#grp_name is bus      grp_df is data for each bus
+for grp_name, grp_df in grps:
+    normalised_mw = grp_df[['cleansed_mw']].fillna(0)
+    normalised_list = normalised_mw.values.flatten().tolist()
+    he.append(normalised_list)
+
+#print(grp_name)
+#	print(normalised_list)
+
+	#print(len(normalised_list))
+#print(grp_name)
+#print(he)
+##############################################################
+
+#df["name"] = df["sub"] + "/" + df["season"] + "/" + df["unit"]
+#cols = [0, 1, 2]
+#df.drop(df.columns[cols], axis=1, inplace=True)
+#df.set_index("name", inplace=True)
+
+# Winter / Int. Warm / Summer / Int. Cool
+SEASON= "Intermediate warm"
+UNIT  =   "MW "
+F_NAME = SEASON + "_" + UNIT
+# Filter dataframe using index
+#filter_df = SEASON + "/" + UNIT
+#df = df[df.index.str.contains(filter_df)]
+
+# Convert to timeseries dataset for tslearn (number of timeseries, length and dimension)
+#X_raw = to_time_series_dataset(df.values.tolist())
+X_raw=he
+X = TimeSeriesScalerMeanVariance(mu=0.0, std=1.0).fit_transform(X_raw)
+# X = to_time_series_dataset(df.values.tolist())
+
+# Apply DTW and KMeans clustering, find optimum value of K
+# DTW has warping limited to +/- 1.5 hrs
+K = range(2, 11)
+distortions = []
+sil_score = []
+
+for k in K:
+    print(k)
+    model = TimeSeriesKMeans(
+        n_clusters=k,
+        metric="dtw",
+        metric_params={"global_constraint": "sakoe_chiba", "sakoe_chiba_radius": 2},
+    ).fit(X)
+
+    distortions.append(model.inertia_)
+    sil_score.append(silhouette_score(
+                        X,
+                        model.labels_,
+                        metric="dtw",
+                        metric_params={"global_constraint": "sakoe_chiba", "sakoe_chiba_radius": 2},
+                    )) 
+
+plt.figure(figsize=(8, 4))
+plt.plot(K, distortions, "bx-")
+plt.xlabel("Number of clusters")
+plt.ylabel("Distortion")
+plt.title("Elbow method " + SEASON + " " + UNIT)
+plt.savefig("Elbow_" + F_NAME + ".pdf")
+plt.show()
+
+plt.figure(figsize=(8, 4))
+plt.plot(K, sil_score, "bx-")
+plt.xlabel("Number of clusters")
+plt.ylabel("Silhouette score")
+plt.title("Silhouette all year cleansed_mw normalised")
+plt.savefig("Silhouette_" + F_NAME + ".pdf")
+plt.show()
+print(model.labels_)
+
+RATING_CLUSTERS={
+    1002 : 5,
+    1004: 3,
+    2008:0,
+    2017:0,
+    2018:0,
+    2025:6,
+    2026:2,
+    2034:8,
+    2035:9,
+    2036:7,
+    2037:1,
+    2057:0,
+    2059:0,
+    2079:0,
+    2067:0,
+    2094:4,
+    2052:0,
+    2082:0,
+    2068:0
+}
+
+num_clusters = 6 #change to six
+model = TimeSeriesKMeans(
+    n_clusters=num_clusters,
+    metric="dtw",
+    metric_params={"global_constraint": "sakoe_chiba", "sakoe_chiba_radius": 2},
+).fit(X)
+#df["cluster"] = model.labels_
+df['cluster']=df['bus_number'].map(RATING_CLUSTERS)
+
+#df.to_excel('cluster.xlsx')
+#print(df['cluster'])
+#df.to_csv('cluster.csv')
